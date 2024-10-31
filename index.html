@@ -1,11 +1,27 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/bp.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CM Challenge | Ben Paine</title>
   </head>
   <body>
-    <main class="main"></main>
-    <script type="module" src="./src/index.js"></script>
+    <main class="main">
+      <nav class="slider-nav">
+        <div class="slider-nav-wrapper"></div>
+        <div class="slider-bar"></div>
+      </nav>
+      <section class="info">
+        <div class="time-container">
+          <div class="time-headline">
+            <p>Current time in</p>
+            <div class="time-city-container"></div>
+          </div>
+          <div class="time"></div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="src/index.js"></script>
   </body>
 </html>

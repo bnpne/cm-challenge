@@ -11,5 +11,8 @@
   "author": "Ben Paine",
   "devDependencies": {
     "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0"
   }
 }
