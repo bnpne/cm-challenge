@@ -44,6 +44,7 @@ html {
   justify-content: center;
   z-index: 2;
   padding: 0 6rem;
+  position: relative;
 }
 
 /* Bar */
@@ -82,7 +83,7 @@ html {
 
     .button {
       pointer-events: none;
-      color: inherit; /* Use inherit to maintain color consistency */
+      color: var(--black); /* Use inherit to maintain color consistency */
     }
   }
 
@@ -128,12 +129,13 @@ html {
       position: absolute;
       top: 0;
       left: 0;
-      opacity: 0;
+      /* opacity: 0; */
       transform: translateY(-100%);
-      transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 1.5s;
+      transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1),
+        opacity 1.5s cubic-bezier(0.23, 1, 0.32, 1);
 
       &.active {
-        opacity: 1;
+        /* opacity: 1; */
         transform: translateY(0);
       }
     }
@@ -144,18 +146,19 @@ html {
   position: relative;
   height: 12rem;
   color: var(--dodger);
+  overflow: hidden;
 
   .time-local {
     position: absolute;
     top: 0;
     left: 0;
-    opacity: 0;
+    /* opacity: 0; */
     transform: translateY(-100%);
-    transition: transform 1.5s 0.1s cubic-bezier(0.23, 1, 0.32, 1),
-      opacity 1.5s 0.1s;
+    transition: transform 1.5s 0.12s cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 1.5s 0.12s cubic-bezier(0.23, 1, 0.32, 1);
 
     &.active {
-      opacity: 1;
+      /* opacity: 1; */
       transform: translateY(0);
     }
   }

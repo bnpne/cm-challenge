@@ -137,14 +137,17 @@ class App {
 
         if (button.index === this.activeButton) {
           button.wrapper.classList.add("active");
-          button.cityEl.classList.add("active");
-          button.timeEl.classList.add("active");
+
+          // Delay addition of active classes
+          setTimeout(() => {
+            button.cityEl.classList.add("active");
+            button.timeEl.classList.add("active");
+          }, 500);
 
           // Set sliderBar width and location
           this.sliderBar.style.width = `${button.bounds.width}px`;
           this.sliderBar.style.transform = `translate(${button.bounds.left}px, 0)`;
         } else {
-          // Remove active classes
           button.wrapper.classList.remove("active");
           button.cityEl.classList.remove("active");
           button.timeEl.classList.remove("active");
@@ -164,21 +167,11 @@ class App {
     this.updateSlider();
   }
 
-  // Debounce function
-  debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
   // Resize listener
   resize() {
+    // Disable smooth transition while resizeing
+    this.sliderBar.style.transition = "none";
+
     if (this.buttons.length === this.data.cities.length) {
       this.buttons.forEach((button) => {
         button.bounds = button.wrapper.getBoundingClientRect();
@@ -186,14 +179,16 @@ class App {
 
       this.updateSlider();
     }
+
+    // Restore transition
+    setTimeout(() => {
+      this.sliderBar.style.transition = "";
+    }, 50);
   }
 
   // Initialize Global Listeners
   initListeners() {
-    window.addEventListener(
-      "resize",
-      this.debounce(this.resize.bind(this), 100)
-    );
+    window.addEventListener("resize", this.resize.bind(this));
   }
 }
 
