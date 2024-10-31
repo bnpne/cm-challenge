@@ -16,7 +16,7 @@ html {
 .main {
   height: 100%;
   width: 100%;
-  min-height: 100vh; /* Use vh for better compatibility */
+  min-height: 100vh;
   padding: 2rem 0;
 
   /* Layout */
@@ -83,7 +83,7 @@ html {
 
     .button {
       pointer-events: none;
-      color: var(--black); /* Use inherit to maintain color consistency */
+      color: var(--black);
     }
   }
 

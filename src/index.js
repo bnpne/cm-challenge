@@ -42,7 +42,7 @@ class App {
       return await res.json();
     } catch (error) {
       console.error(error);
-      return null; // return null or handle as necessary
+      return null;
     }
   }
 
