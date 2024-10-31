@@ -1,0 +1,15 @@
+{
+  "name": "cm-challenge",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite --port 3000",
+    "build": "vite build"
+  },
+  "author": "Ben Paine",
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
