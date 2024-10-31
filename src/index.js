@@ -4,15 +4,15 @@ import { format } from "date-fns";
 class App {
   constructor() {
     // checker
-    if (typeof window === undefined) return;
+    if (typeof window === "undefined") return;
 
     // Initialize variables
-    this.sliderNav;
-    this.sliderBar;
-    this.sliderBounds;
-    this.timeContainer;
-    this.textContainer;
-    this.data;
+    this.sliderNav = null;
+    this.sliderBar = null;
+    this.sliderBounds = null;
+    this.timeContainer = null;
+    this.textContainer = null;
+    this.data = null;
     this.buttons = [];
     this.activeButton = 0;
 
@@ -21,7 +21,7 @@ class App {
 
   // Initialize the data and variables
   async init() {
-    // Get slider nav
+    // Get slider nav and containers
     this.sliderNav = document.querySelector(".slider-nav-wrapper");
     this.sliderBar = document.querySelector(".slider-bar");
     this.textContainer = document.querySelector(".time-city-container");
@@ -30,31 +30,26 @@ class App {
     this.initListeners();
 
     // Fetch data and set
-    await this.fetchData().then((d) => {
-      this.data = d;
-      this.createDom();
-    });
+    this.data = await this.fetchData();
+    this.createDom();
   }
 
   // Data fetch
-  fetchData() {
-    return fetch("/lib/navigation.json")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Cannot fetch JSON");
-        }
-
-        return res.json();
-      })
-      .catch((error) => {
-        throw error;
-      });
+  async fetchData() {
+    try {
+      const res = await fetch("/lib/navigation.json");
+      if (!res.ok) throw new Error("Cannot fetch JSON");
+      return await res.json();
+    } catch (error) {
+      console.error(error);
+      return null; // return null or handle as necessary
+    }
   }
 
   // Create Dom
   createDom() {
-    if (this.sliderNav && this.data) {
-      this.data?.cities?.forEach(async (city, index) => {
+    if (this.sliderNav && this.data?.cities) {
+      this.data.cities.forEach((city, index) => {
         // Button Wrapper
         const buttonWrapper = document.createElement("div");
         buttonWrapper.classList.add("button-wrapper");
@@ -62,9 +57,7 @@ class App {
         // Button Element
         const buttonEl = document.createElement("button");
         buttonEl.classList.add("button");
-
-        // Add inner HMTL
-        buttonEl.innerHTML = city?.label;
+        buttonEl.innerHTML = city.label;
 
         // Append
         buttonWrapper.appendChild(buttonEl);
@@ -73,44 +66,36 @@ class App {
         // Create event listener
         buttonEl.addEventListener("click", () => this.click(index));
 
-        // City element
+        // City and time elements
         const cityEl = document.createElement("p");
         cityEl.classList.add("time-city");
-        cityEl.innerHTML = city?.label;
+        cityEl.innerHTML = city.label;
 
-        // Get time
-        const time = this.getLocalTime(city?.label);
-
-        // City element
         const timeEl = document.createElement("p");
-        const formatTime = format(new Date(time), "h:mm a");
         timeEl.classList.add("time-local");
-        timeEl.innerHTML = formatTime;
+        const time = this.getLocalTime(city.label);
+        timeEl.innerHTML = format(new Date(time), "h:mm a");
 
-        // Add city element
+        // Add elements to the container
         this.textContainer.appendChild(cityEl);
-
-        // Add time element
         this.timeContainer.appendChild(timeEl);
 
         // Create button object
-        const buttonObj = {
-          index: index,
-          isActive: index === 0 ? true : false,
+        this.buttons[index] = {
+          index,
+          isActive: index === 0,
           wrapper: buttonWrapper,
           button: buttonEl,
-          cityEl: cityEl,
-          label: city?.label,
-          section: city?.section,
+          cityEl,
+          label: city.label,
+          section: city.section,
           bounds: null,
-          time: time,
-          timeEl: timeEl,
+          time,
+          timeEl,
         };
-
-        this.buttons[index] = buttonObj;
       });
 
-      // After dom is loaded set bar initial state
+      // After DOM is loaded set bar initial state
       this.updateSlider();
     }
   }
@@ -144,32 +129,22 @@ class App {
   }
 
   updateSlider() {
-    if (this.buttons.length === this.data?.cities.length && this.sliderBar) {
+    if (this.buttons.length === this.data.cities.length && this.sliderBar) {
       this.buttons.forEach((button) => {
-        // Get bounds
-        const bounds = button.wrapper.getBoundingClientRect();
-        button.bounds = bounds;
+        // Get bounds and time
+        button.bounds = button.wrapper.getBoundingClientRect();
+        button.time = this.getLocalTime(button.label);
 
-        // Get time
-        const time = this.getLocalTime(button.label);
-        button.time = time;
-
-        // If button is correct active index
         if (button.index === this.activeButton) {
-          if (!button.wrapper.classList.contains("active")) {
-            // Toggle active class
-            button.wrapper.classList.toggle("active");
-            button.cityEl.classList.toggle("active");
-            button.timeEl.classList.toggle("active");
-          }
+          button.wrapper.classList.add("active");
+          button.cityEl.classList.add("active");
+          button.timeEl.classList.add("active");
 
-          // set sliderBar width
-          this.sliderBar.style.width = `${button.bounds?.width}px`;
-
-          // set sliderBar location
+          // Set sliderBar width and location
+          this.sliderBar.style.width = `${button.bounds.width}px`;
           this.sliderBar.style.transform = `translate(${button.bounds.left}px, 0)`;
         } else {
-          // Else, remove active classes
+          // Remove active classes
           button.wrapper.classList.remove("active");
           button.cityEl.classList.remove("active");
           button.timeEl.classList.remove("active");
@@ -180,27 +155,33 @@ class App {
 
   // Handle Click
   click(active) {
-    // Set Active
     this.activeButton = active;
 
     this.buttons.forEach((button, index) => {
-      if (index === this.activeButton) {
-        button.isActive = true;
-      } else {
-        button.isActive = false;
-      }
+      button.isActive = index === this.activeButton;
     });
 
     this.updateSlider();
   }
 
+  // Debounce function
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   // Resize listener
   resize() {
-    if (this.buttons && this.buttons.length === this.data?.cities.length) {
+    if (this.buttons.length === this.data.cities.length) {
       this.buttons.forEach((button) => {
-        // Update button bounds
-        const newBounds = button.wrapper?.getBoundingClientRect();
-        button.bounds = newBounds;
+        button.bounds = button.wrapper.getBoundingClientRect();
       });
 
       this.updateSlider();
@@ -209,7 +190,10 @@ class App {
 
   // Initialize Global Listeners
   initListeners() {
-    window.addEventListener("resize", this.resize.bind(this));
+    window.addEventListener(
+      "resize",
+      this.debounce(this.resize.bind(this), 100)
+    );
   }
 }
 
