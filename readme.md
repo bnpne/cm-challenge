@@ -1,10 +1,8 @@
-# Critical Mass Coding Challenge
+# Critical Mass Coding Challenge — Ben Paine
 
-Ben Paine
+Using a minimal setup of Javascript, ES6, Vite, and CSS.
 
----
-
-Using a minimal setup of Javascript, ES6, Vite, and CSS
+Provided JSON file, `navigation.json`, is located in the `/public/lib` folder.
 
 ## Running the project
 
